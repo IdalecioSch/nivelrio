@@ -8,14 +8,14 @@ import java.util.Map;
  */
 public class App {
     public static void main( String[] args ){
-        InfluxAPI influxApi = new InfluxAPI();
+        InfluxAPI InfluxApi = new InfluxAPI();
+        DefesaCivilAPI DefesaCivilApi = new DefesaCivilAPI();
         while(true){
-            Map<Integer,NivelRioDTO> NiveisDTOs = (new DefesaCivilAPI()).getNiveisAsDTOs();
+            Map<Integer,NivelRioDTO> NiveisDTOs = DefesaCivilApi.getNiveisAsDTOs();
             NiveisDTOs.forEach((id, NivelDto) -> {
-                influxApi.doEnviarInfo(NivelDto);
+                InfluxApi.doEnviarInfo(NivelDto);
                 System.out.println("Enviado Dados "+NivelDto.getRio()+": "+NivelDto.getNivel());
             });
-            NiveisDTOs.clear();
             try {
                 Thread.sleep(6000);
             } catch (InterruptedException e) {

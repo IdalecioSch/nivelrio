@@ -17,9 +17,10 @@ public class DefesaCivilAPI {
     private HttpClient client;
     private HttpRequest requestRios;
     private HttpRequest requestNivel;
-
+    private ObjectMapper mapper;
 
     public DefesaCivilAPI(){
+        this.mapper = new ObjectMapper();
         this.client = HttpClient.newHttpClient();
         this.requestRios = HttpRequest.newBuilder()
                                       .uri(URI.create("https://public.asthon.com.br/public/stations/list?city_id=4214805&_v=2"))
@@ -35,8 +36,6 @@ public class DefesaCivilAPI {
 
 public Map<Integer, NivelRioDTO> getNiveisAsDTOs() {
     Map<Integer, NivelRioDTO> niveis = new HashMap<>();
-    ObjectMapper mapper = new ObjectMapper();
-
     try {
         String responseRios = client.send(
             this.requestRios,
@@ -68,6 +67,9 @@ public Map<Integer, NivelRioDTO> getNiveisAsDTOs() {
             Float nivel = Float.parseFloat(rio.path("level_m").asText("0.0"));
 
             NivelRioDTO dto = niveis.get(id);
+            if(dto == null){
+                continue;
+            }
             dto.setNivel(nivel);
             niveis.put(id, dto);
         }
