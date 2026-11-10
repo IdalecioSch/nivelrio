@@ -34,52 +34,52 @@ public class DefesaCivilAPI {
                               .build();
     }
 
-public Map<Integer, NivelRioDTO> getNiveisAsDTOs() {
-    Map<Integer, NivelRioDTO> niveis = new HashMap<>();
-    try {
-        String responseRios = client.send(
-            this.requestRios,
-            HttpResponse.BodyHandlers.ofString()
-        ).body();
-
-        JsonNode jsonRios = mapper.readTree(responseRios);
-
-        for (JsonNode rio : jsonRios) {
-            String uuid = rio.get("station_id").asText();
-            int id = UUID.fromString(uuid).hashCode();
-            String nome = rio.get("name").asText();
-
-            NivelRioDTO dto = new NivelRioDTO();
-            dto.setRio(nome);
-            dto.setIdRio(id);
-            niveis.put(id, dto);
-        }
-
-        String responseNiveis = client.send(
-            this.requestNivel,
-            HttpResponse.BodyHandlers.ofString()
-        ).body();
-
-        JsonNode jsonNiveis = mapper.readTree(responseNiveis);
-        for (JsonNode rio : jsonNiveis) {
-            String uuid = rio.path("station_id").asText();
-            int id = UUID.fromString(uuid).hashCode();
-            Float nivel = Float.parseFloat(rio.path("level_m").asText("0.0"));
-
-            NivelRioDTO dto = niveis.get(id);
-            if(dto == null){
-                continue;
+    public Map<Integer, NivelRioDTO> getNiveisAsDTOs() {
+        Map<Integer, NivelRioDTO> niveis = new HashMap<>();
+        try {
+            String responseRios = client.send(
+                this.requestRios,
+                HttpResponse.BodyHandlers.ofString()
+            ).body();
+    
+            JsonNode jsonRios = mapper.readTree(responseRios);
+    
+            for (JsonNode rio : jsonRios) {
+                String uuid = rio.get("station_id").asText();
+                int id = UUID.fromString(uuid).hashCode();
+                String nome = rio.get("name").asText();
+    
+                NivelRioDTO dto = new NivelRioDTO();
+                dto.setRio(nome);
+                dto.setIdRio(id);
+                niveis.put(id, dto);
             }
-            dto.setNivel(nivel);
-            niveis.put(id, dto);
+    
+            String responseNiveis = client.send(
+                this.requestNivel,
+                HttpResponse.BodyHandlers.ofString()
+            ).body();
+    
+            JsonNode jsonNiveis = mapper.readTree(responseNiveis);
+            for (JsonNode rio : jsonNiveis) {
+                String uuid = rio.path("station_id").asText();
+                int id = UUID.fromString(uuid).hashCode();
+                Float nivel = Float.parseFloat(rio.path("level_m").asText("0.0"));
+    
+                NivelRioDTO dto = niveis.get(id);
+                if(dto == null){
+                    continue;
+                }
+                dto.setNivel(nivel);
+                niveis.put(id, dto);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Erro ao consultar estações", e);
         }
-    } catch (IOException e) {
-        e.printStackTrace();
-    } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        throw new RuntimeException("Erro ao consultar estações", e);
+    
+        return niveis;
     }
-
-    return niveis;
-}
 }
